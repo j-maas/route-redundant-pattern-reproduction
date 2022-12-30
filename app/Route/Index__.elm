@@ -1,12 +1,17 @@
-module Route.Blog.Slug_ exposing (ActionData, Data, Model, Msg, route)
+module Route.Index__ exposing (ActionData, Data, Model, Msg, route)
 
 import DataSource exposing (DataSource)
+import DataSource.Http
 import Head
 import Head.Seo as Seo
 import Html
+import Html.Attributes as Attr
+import Json.Decode as Decode
 import Pages.Msg
 import Pages.PageUrl exposing (PageUrl)
 import Pages.Url
+import Path
+import Route
 import RouteBuilder exposing (StatelessRoute, StaticPayload)
 import Shared
 import View exposing (View)
@@ -21,28 +26,12 @@ type alias Msg =
 
 
 type alias RouteParams =
-    { slug : String }
-
-
-route : StatelessRoute RouteParams Data ActionData
-route =
-    RouteBuilder.preRender
-        { head = head
-        , pages = pages
-        , data = data
-        }
-        |> RouteBuilder.buildNoState { view = view }
-
-
-pages : DataSource (List RouteParams)
-pages =
-    DataSource.succeed
-        [ { slug = "hello" }
-        ]
+    { index : Maybe String
+    }
 
 
 type alias Data =
-    { something : String
+    { message : String
     }
 
 
@@ -50,28 +39,46 @@ type alias ActionData =
     {}
 
 
+route : StatelessRoute RouteParams Data ActionData
+route =
+    RouteBuilder.preRender
+        { head = head
+        , data = data
+        , pages = pages
+        }
+        |> RouteBuilder.buildNoState { view = view }
+
+
+pages : DataSource (List RouteParams)
+pages =
+    DataSource.succeed
+        [ { index = Nothing }
+        ]
+
+
 data : RouteParams -> DataSource Data
-data routeParams =
-    DataSource.map Data
-        (DataSource.succeed "Hi")
+data _ =
+    DataSource.succeed Data
+        |> DataSource.andMap
+            (DataSource.succeed "Hello!")
 
 
 head :
     StaticPayload Data ActionData RouteParams
     -> List Head.Tag
-head static =
+head app =
     Seo.summary
         { canonicalUrlOverride = Nothing
         , siteName = "elm-pages"
         , image =
-            { url = Pages.Url.external "TODO"
+            { url = [ "images", "icon-png.png" ] |> Path.join |> Pages.Url.fromPath
             , alt = "elm-pages logo"
             , dimensions = Nothing
             , mimeType = Nothing
             }
-        , description = "TODO"
+        , description = "Welcome to elm-pages!"
         , locale = Nothing
-        , title = "TODO title" -- metadata.title -- TODO
+        , title = "elm-pages is running"
         }
         |> Seo.website
 
@@ -81,7 +88,12 @@ view :
     -> Shared.Model
     -> StaticPayload Data ActionData RouteParams
     -> View (Pages.Msg.Msg Msg)
-view maybeUrl sharedModel static =
-    { title = "Placeholder - Blog.Slug_"
-    , body = [ Html.text "You're on the page Blog.Slug_" ]
+view maybeUrl sharedModel app =
+    { title = "elm-pages is running"
+    , body =
+        [ Html.h1 [] [ Html.text "elm-pages is up and running!" ]
+        , Html.p []
+            [ Html.text <| "The message is: " ++ app.data.message
+            ]
+        ]
     }

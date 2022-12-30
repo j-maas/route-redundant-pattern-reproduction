@@ -13,13 +13,3 @@ routes :
     -> List (ApiRoute ApiRoute.Response)
 routes getStaticRoutes htmlToString =
     []
-
-
-manifest : Manifest.Config
-manifest =
-    Manifest.init
-        { name = "Site Name"
-        , description = "Description"
-        , startUrl = Route.Index |> Route.toPath
-        , icons = []
-        }
