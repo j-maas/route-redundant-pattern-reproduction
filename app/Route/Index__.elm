@@ -1,7 +1,7 @@
 module Route.Index__ exposing (ActionData, Data, Model, Msg, route)
 
-import DataSource exposing (DataSource)
-import DataSource.Http
+import BackendTask exposing (BackendTask)
+import BackendTask.Http
 import Head
 import Head.Seo as Seo
 import Html
@@ -49,18 +49,18 @@ route =
         |> RouteBuilder.buildNoState { view = view }
 
 
-pages : DataSource (List RouteParams)
+pages : BackendTask error (List RouteParams)
 pages =
-    DataSource.succeed
+    BackendTask.succeed
         [ { index = Nothing }
         ]
 
 
-data : RouteParams -> DataSource Data
+data : RouteParams -> BackendTask error Data
 data _ =
-    DataSource.succeed Data
-        |> DataSource.andMap
-            (DataSource.succeed "Hello!")
+    BackendTask.succeed Data
+        |> BackendTask.andMap
+            (BackendTask.succeed "Hello!")
 
 
 head :
