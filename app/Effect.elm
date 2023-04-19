@@ -7,7 +7,6 @@ module Effect exposing (Effect(..), batch, fromCmd, map, none, perform)
 -}
 
 import Browser.Navigation
-import Form.FormData exposing (FormData)
 import Http
 import Json.Decode as Decode
 import Pages.Fetcher
@@ -21,14 +20,14 @@ type Effect msg
     | Batch (List (Effect msg))
     | GetStargazers (Result Http.Error Int -> msg)
     | SetField { formId : String, name : String, value : String }
-    | FetchRouteData
-        { data : Maybe FormData
-        , toMsg : Result Http.Error Url -> msg
-        }
-    | Submit
-        { values : FormData
-        , toMsg : Result Http.Error Url -> msg
-        }
+    --| FetchRouteData
+    --    { data : Maybe FormData
+    --    , toMsg : Result Http.Error Url -> msg
+    --    }
+    --| Submit
+    --    { values : FormData
+    --    , toMsg : Result Http.Error Url -> msg
+    --    }
     | SubmitFetcher (Pages.Fetcher.Fetcher msg)
 
 
@@ -73,17 +72,17 @@ map fn effect =
         GetStargazers toMsg ->
             GetStargazers (toMsg >> fn)
 
-        FetchRouteData fetchInfo ->
-            FetchRouteData
-                { data = fetchInfo.data
-                , toMsg = fetchInfo.toMsg >> fn
-                }
-
-        Submit fetchInfo ->
-            Submit
-                { values = fetchInfo.values
-                , toMsg = fetchInfo.toMsg >> fn
-                }
+        --FetchRouteData fetchInfo ->
+        --    FetchRouteData
+        --        { data = fetchInfo.data
+        --        , toMsg = fetchInfo.toMsg >> fn
+        --        }
+        --
+        --Submit fetchInfo ->
+        --    Submit
+        --        { values = fetchInfo.values
+        --        , toMsg = fetchInfo.toMsg >> fn
+        --        }
 
         SetField info ->
             SetField info
@@ -97,12 +96,12 @@ map fn effect =
 {-| -}
 perform :
     { fetchRouteData :
-        { data : Maybe FormData
+        { data : Maybe a
         , toMsg : Result Http.Error Url -> pageMsg
         }
         -> Cmd msg
     , submit :
-        { values : FormData
+        { values : a
         , toMsg : Result Http.Error Url -> pageMsg
         }
         -> Cmd msg
@@ -136,12 +135,12 @@ perform ({ fromPageMsg, key } as helpers) effect =
                 , expect = Http.expectJson (toMsg >> fromPageMsg) (Decode.field "stargazers_count" Decode.int)
                 }
 
-        FetchRouteData fetchInfo ->
-            helpers.fetchRouteData
-                fetchInfo
-
-        Submit record ->
-            helpers.submit record
+        --FetchRouteData fetchInfo ->
+        --    helpers.fetchRouteData
+        --        fetchInfo
+        --
+        --Submit record ->
+        --    helpers.submit record
 
         SubmitFetcher record ->
             helpers.runFetcher record
