@@ -7,12 +7,12 @@ import Head.Seo as Seo
 import Html
 import Html.Attributes as Attr
 import Json.Decode as Decode
-import Pages.Msg
+import PagesMsg exposing (PagesMsg)
 import Pages.PageUrl exposing (PageUrl)
 import Pages.Url
 import Path
 import Route
-import RouteBuilder exposing (StatelessRoute, StaticPayload)
+import RouteBuilder exposing (StatelessRoute , App)
 import Shared
 import View exposing (View)
 
@@ -64,7 +64,7 @@ data _ =
 
 
 head :
-    StaticPayload Data ActionData RouteParams
+    App Data ActionData RouteParams
     -> List Head.Tag
 head app =
     Seo.summary
@@ -84,11 +84,10 @@ head app =
 
 
 view :
-    Maybe PageUrl
+     App Data ActionData RouteParams
     -> Shared.Model
-    -> StaticPayload Data ActionData RouteParams
-    -> View (Pages.Msg.Msg Msg)
-view maybeUrl sharedModel app =
+    -> View (PagesMsg Msg )
+view app sharedModel =
     { title = "elm-pages is running"
     , body =
         [ Html.h1 [] [ Html.text "elm-pages is up and running!" ]
